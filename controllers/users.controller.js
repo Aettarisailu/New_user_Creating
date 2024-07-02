@@ -62,6 +62,36 @@ const registerUser = async (req, res) => {
 };
 
 // Login user
+// const loginUser = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     // Check if all required fields are provided
+//     if (!email || !password) {
+//       return res.status(400).json({ message: 'All fields are required' });
+//     }
+
+//     const user = await UserModel.findOne({ email });
+//     if (!user) {
+//       return res.status(400).json({ message: 'Invalid email or password' });
+//     }
+
+//     const isMatch = await bcrypt.compare(password, user.password);
+//     if (!isMatch) {
+//       return res.status(400).json({ message: 'Invalid email or password' });
+//     }
+
+//     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+//       expiresIn: '1h'
+//     });
+
+//     res.status(200).json({ token, username: user.username });
+//   } catch (error) {
+//     console.error('Error logging in user:', error.message);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// };
+
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -73,11 +103,13 @@ const loginUser = async (req, res) => {
 
     const user = await UserModel.findOne({ email });
     if (!user) {
+      console.error('User not found for email:', email);
       return res.status(400).json({ message: 'Invalid email or password' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+      console.error('Password mismatch for user:', email);
       return res.status(400).json({ message: 'Invalid email or password' });
     }
 
@@ -85,12 +117,15 @@ const loginUser = async (req, res) => {
       expiresIn: '1h'
     });
 
+    console.log('User logged in successfully:', email);
     res.status(200).json({ token, username: user.username });
   } catch (error) {
     console.error('Error logging in user:', error.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+
 
 // Forgot password
 const forgotPassword = async (req, res) => {
